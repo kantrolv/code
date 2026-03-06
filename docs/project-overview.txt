@@ -1,0 +1,5 @@
+
+CodeRefine is an AI-powered automated code review system.
+
+Workflow:
+User submits code -> Backend API -> AI analysis -> Structured report -> Display results

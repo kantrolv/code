@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeRefine AI – Code Review & Security Analyzer</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/java.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+
+  <!-- Marked.js -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- Tailwind Config Customization -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            bgDark: '#0f172a',
+            cardDark: '#1e293b',
+            accent: '#7c3aed',
+            accentHover: '#6d28d9',
+            brand: {
+              400: '#7c3aed',
+              500: '#6d28d9'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+
+<body class="bg-bgDark text-white font-sans h-screen flex flex-col overflow-hidden">
+
+  <!-- TOP NAVBAR -->
+  <header class="bg-bgDark border-b border-gray-800 h-16 flex items-center justify-between px-6 z-20 shadow-md">
+    <div class="flex items-center gap-4">
+      <div
+        class="w-10 h-10 rounded-xl bg-accent flex items-center justify-center shadow-[0_0_15px_rgba(124,58,237,0.5)]">
+        <span class="text-xl">🤖</span>
+      </div>
+      <div class="flex flex-col">
+        <h1 class="text-lg font-bold leading-tight">CodeRefine AI</h1>
+        <p class="text-[10px] text-gray-400 font-semibold uppercase tracking-widest leading-none">AI Code Review &
+          Security Analyzer</p>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- MAIN LAYOUT -->
+  <div class="flex flex-1 overflow-hidden relative">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar"
+      class="w-64 bg-cardDark border-r border-gray-800 flex flex-col transition-all duration-300 z-10 shrink-0">
+      <nav class="flex-1 py-6 flex flex-col gap-2 px-3">
+
+        <button data-target="dashboard"
+          class="nav-link bg-accent/10 text-accent font-semibold flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm text-left">
+          <svg class="sidebar-icon w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          <span class="sidebar-text">Dashboard</span>
+        </button>
+
+        <button data-target="code-review"
+          class="nav-link text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium text-left">
+          <svg class="sidebar-icon w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+          <span class="sidebar-text">Code Review</span>
+        </button>
+
+        <button data-target="code-rewrite"
+          class="nav-link text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium text-left">
+          <svg class="sidebar-icon w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <span class="sidebar-text">Code Rewrite</span>
+        </button>
+
+        <button data-target="github-analyzer"
+          class="nav-link text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium text-left">
+          <svg class="sidebar-icon w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd"
+              d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.379.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z"
+              clip-rule="evenodd" />
+          </svg>
+          <span class="sidebar-text">GitHub Analyzer</span>
+        </button>
+
+        <button data-target="security-report"
+          class="nav-link text-gray-400 hover:text-white hover:bg-gray-800 flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-medium text-left">
+          <svg class="sidebar-icon w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span class="sidebar-text">Security Report</span>
+        </button>
+
+      </nav>
+
+      <div class="p-4 border-t border-gray-800 flex justify-center">
+        <button id="sidebar-toggle" class="text-gray-500 hover:text-white transition p-2 rounded-lg bg-bgDark">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <!-- WORKSPACE AREA -->
+    <main class="flex-1 overflow-y-auto p-6 md:p-8 relative bg-bgDark/50">
+
+      <!-- Loading Overlay -->
+      <div id="loading-overlay"
+        class="hidden absolute inset-0 bg-bgDark/70 backdrop-blur-sm z-50 flex flex-col items-center justify-center">
+        <div class="spinner mb-4"></div>
+        <p id="loading-text" class="text-accent font-semibold tracking-wide">Processing...</p>
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <div id="page-dashboard" class="page-content active animate-fade-in">
+        <div class="flex justify-between items-end mb-8">
+          <div>
+            <h2 class="text-3xl font-extrabold text-white mb-2">System Dashboard</h2>
+            <p class="text-gray-400">Overview of recent code analyses and repository metrics.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Security Score -->
+          <div
+            class="bg-cardDark rounded-2xl p-6 border border-gray-800 shadow-lg hover:-translate-y-1 transition duration-300">
+            <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Security Score</div>
+            <div
+              class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-green-500">
+              85 / 100</div>
+          </div>
+          <!-- Code Quality Score -->
+          <div
+            class="bg-cardDark rounded-2xl p-6 border border-gray-800 shadow-lg hover:-translate-y-1 transition duration-300">
+            <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Code Quality</div>
+            <div class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-500">
+              78 / 100</div>
+          </div>
+          <!-- Performance Score -->
+          <div
+            class="bg-cardDark rounded-2xl p-6 border border-gray-800 shadow-lg hover:-translate-y-1 transition duration-300">
+            <div class="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2">Performance</div>
+            <div
+              class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-amber-400 to-orange-500">92
+              / 100</div>
+          </div>
+        </div>
+
+        <div class="bg-cardDark p-6 rounded-2xl border border-gray-800 shadow-lg w-full max-w-2xl">
+          <h3 class="text-lg font-bold mb-6 text-white tracking-wide">Security vs Quality vs Performance</h3>
+          <div class="w-full aspect-video">
+            <canvas id="metricsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CODE REVIEW PAGE -->
+      <div id="page-code-review" class="page-content animate-fade-in">
+        <h2 class="text-3xl font-extrabold text-white mb-2">Code Review Workspace</h2>
+        <p class="text-gray-400 mb-8">Paste your code below to detect bugs, security vulnerabilities, and bad practices.
+        </p>
+
+        <!-- Input Section -->
+        <div class="bg-cardDark p-6 rounded-2xl border border-gray-800 mb-8 shadow-lg">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
+
+            <!-- Language Dropdown -->
+            <div class="flex flex-col gap-2">
+              <label class="text-xs font-bold text-gray-500 uppercase tracking-wider">Language</label>
+              <select id="language-select"
+                class="bg-bgDark border border-gray-700 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-accent">
+                <option value="Python">Python</option>
+                <option value="JavaScript">JavaScript</option>
+                <option value="TypeScript">TypeScript</option>
+                <option value="Java">Java</option>
+                <option value="C++">C++</option>
+              </select>
+            </div>
+
+            <!-- Focus Areas -->
+            <div class="flex-1">
+              <label class="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Analysis Focus</label>
+              <div class="flex flex-wrap gap-4 text-sm font-medium">
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" value="Bugs" checked
+                    class="w-4 h-4 text-accent border-gray-600 rounded bg-bgDark focus:ring-accent accent-accent">
+                  <span class="group-hover:text-amber-400 transition">Bugs</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" value="Security" checked
+                    class="w-4 h-4 text-accent border-gray-600 rounded bg-bgDark focus:ring-accent accent-accent">
+                  <span class="group-hover:text-red-400 transition">Security</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" value="Performance" checked
+                    class="w-4 h-4 text-accent border-gray-600 rounded bg-bgDark focus:ring-accent accent-accent">
+                  <span class="group-hover:text-emerald-400 transition">Performance</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer group">
+                  <input type="checkbox" value="Best Practices" checked
+                    class="w-4 h-4 text-accent border-gray-600 rounded bg-bgDark focus:ring-accent accent-accent">
+                  <span class="group-hover:text-blue-400 transition">Best Practices</span>
+                </label>
+              </div>
+            </div>
+
+            <button id="load-demo-btn"
+              class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-xs font-semibold rounded-lg transition border border-gray-700 text-gray-300">
+              Load Sample Code
+            </button>
+          </div>
+
+          <textarea id="code-input" spellcheck="false"
+            class="w-full h-72 bg-bgDark border border-gray-700 rounded-xl p-5 font-mono text-sm focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent transition-all text-gray-200 resize-y"
+            placeholder="Paste your source code here..."></textarea>
+
+          <div class="flex flex-wrap gap-4 mt-6">
+            <button id="btn-review"
+              class="bg-accent hover:bg-accentHover text-white px-6 py-3 rounded-xl font-bold text-sm transition shadow-[0_4px_15px_rgba(124,58,237,0.4)] hover:shadow-[0_6px_20px_rgba(124,58,237,0.6)]">
+              Review Code
+            </button>
+            <button id="btn-rewrite"
+              class="bg-bgDark hover:bg-gray-800 border-2 border-accent text-accent px-6 py-3 rounded-xl font-bold text-sm transition">
+              Fix & Rewrite Code
+            </button>
+            <button id="btn-explain"
+              class="bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white px-6 py-3 rounded-xl font-bold text-sm transition">
+              Explain Code
+            </button>
+          </div>
+        </div>
+
+        <!-- Review Results view -->
+        <div id="review-results-view" class="hidden animate-fade-in">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-2xl font-bold text-white">Analysis Results</h3>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left side: Original Code -->
+            <div class="bg-cardDark rounded-2xl border border-gray-800 overflow-hidden flex flex-col shadow-lg">
+              <div class="px-5 py-3 bg-gray-900 border-b border-gray-800 flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                <span class="ml-3 text-xs font-bold text-gray-400 uppercase tracking-widest">Original Code</span>
+              </div>
+              <div class="flex-1 p-0 overflow-auto bg-bgDark">
+                <pre class="m-0 p-5 min-h-[400px] text-sm"><code id="review-orig-code"></code></pre>
+              </div>
+            </div>
+
+            <!-- Right side: AI Review Results -->
+            <div
+              class="bg-cardDark rounded-2xl border border-accent/40 shadow-[0_0_20px_rgba(124,58,237,0.15)] overflow-hidden flex flex-col">
+              <div class="px-5 py-3 bg-gray-900 border-b border-gray-800 flex items-center justify-between">
+                <span class="text-xs font-bold text-accent uppercase tracking-widest flex items-center gap-2">
+                  <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span> AI Feedback
+                </span>
+                <div class="flex gap-2">
+                  <button id="copy-review-content"
+                    class="text-xs font-semibold text-gray-400 hover:text-white px-2 py-1 bg-gray-800 rounded">Copy</button>
+                </div>
+              </div>
+              <div
+                class="flex-1 p-6 overflow-auto max-h-[600px] prose prose-invert prose-dark text-sm w-full max-w-none"
+                id="review-report">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CODE REWRITE PAGE -->
+      <div id="page-code-rewrite" class="page-content animate-fade-in">
+        <h2 class="text-3xl font-extrabold text-white mb-2">Optimized Rewrite</h2>
+        <p class="text-gray-400 mb-8 mt-2">Side-by-side comparison of your code and the AI optimized version.</p>
+
+        <div id="rewrite-empty-state" class="bg-cardDark p-10 rounded-2xl border border-gray-800 text-center">
+          <div class="text-4xl mb-4">🪄</div>
+          <h3 class="text-xl font-bold mb-2">No code rewritten yet</h3>
+          <p class="text-gray-400 mb-6">Go to the Code Review view and run "Fix & Rewrite Code" to generate
+            optimizations.</p>
+          <button class="bg-accent hover:bg-accentHover text-white px-6 py-2 rounded-xl font-bold text-sm transition"
+            onclick="document.querySelector('[data-target=\'code-review\']').click()">Go to Code Review</button>
+        </div>
+
+        <div id="rewrite-results-view" class="hidden">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Left panel: Original -->
+            <div class="bg-cardDark rounded-2xl border border-gray-800 overflow-hidden shadow-lg flex flex-col">
+              <div
+                class="px-5 py-3 bg-gray-900 border-b border-gray-800 flex justify-between items-center text-xs font-bold font-mono text-gray-400 uppercase tracking-widest">
+                <span>Original Code</span>
+              </div>
+              <pre
+                class="m-0 p-5 bg-bgDark flex-1 overflow-auto max-h-[600px] text-sm"><code id="rewrite-orig-code"></code></pre>
+            </div>
+
+            <!-- Right panel: Rewritten -->
+            <div
+              class="bg-cardDark rounded-2xl border border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.15)] overflow-hidden flex flex-col">
+              <div
+                class="px-5 py-3 bg-gray-900 border-b border-gray-800 flex justify-between items-center text-xs font-bold font-mono text-emerald-400 uppercase tracking-widest">
+                <span class="flex items-center gap-2">
+                  <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div> Rewritten Code
+                </span>
+                <button id="copy-rewritten-btn"
+                  class="bg-emerald-500/20 text-emerald-400 px-3 py-1 rounded hover:bg-emerald-500 hover:text-white transition">Copy
+                  Rewritten Code</button>
+              </div>
+              <pre
+                class="m-0 p-5 bg-bgDark flex-1 overflow-auto max-h-[600px] text-sm"><code id="rewrite-new-code"></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GITHUB REPOSITORY ANALYZER PAGE -->
+      <div id="page-github-analyzer" class="page-content animate-fade-in">
+        <h2 class="text-3xl font-extrabold text-white mb-2">GitHub Repository Analyzer</h2>
+        <p class="text-gray-400 mb-8">Scan entire repositories for vulnerabilities and code smells.</p>
+
+        <div class="bg-cardDark p-8 rounded-2xl border border-gray-800 shadow-lg mb-8 max-w-3xl">
+          <label class="block text-sm font-bold text-gray-300 uppercase tracking-wider mb-4">Paste GitHub repository
+            URL</label>
+          <div class="flex flex-col sm:flex-row gap-4">
+            <input type="text" id="github-url-input"
+              class="flex-1 bg-bgDark border border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-accent font-mono"
+              placeholder="https://github.com/user/project">
+            <button id="btn-analyze-repo"
+              class="bg-accent hover:bg-accentHover text-white px-8 py-3 rounded-xl font-bold text-sm transition shadow-lg w-full sm:w-auto shrink-0">
+              Analyze Repository
+            </button>
+          </div>
+        </div>
+
+        <div id="github-empty-state" class="text-center text-gray-500 pt-10">
+          <svg class="w-16 h-16 mx-auto mb-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+          </svg>
+          <p>Ready to analyze. Waiting for repository input.</p>
+        </div>
+
+        <!-- Repository Analysis Results -->
+        <div id="github-results-view" class="hidden">
+          <h3 class="text-2xl font-bold mb-6">Repository Security Report</h3>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+            <div class="bg-cardDark p-6 rounded-2xl border border-gray-800 text-center">
+              <div class="text-sm font-bold text-gray-400 uppercase mb-2">Security Score</div>
+              <div id="repo-sec-score" class="text-4xl font-black text-white">-</div>
+            </div>
+            <div class="bg-cardDark p-6 rounded-2xl border border-gray-800 text-center">
+              <div class="text-sm font-bold text-gray-400 uppercase mb-2">Code Quality</div>
+              <div id="repo-qual-score" class="text-4xl font-black text-white">-</div>
+            </div>
+            <div class="bg-cardDark p-6 rounded-2xl border border-red-500/30 text-center bg-red-900/10">
+              <div class="text-sm font-bold text-red-400 uppercase mb-2">Risk Level</div>
+              <div id="repo-risk-level" class="text-3xl font-black text-red-400 uppercase mt-1">-</div>
+            </div>
+          </div>
+
+          <div class="bg-cardDark rounded-2xl border border-gray-800 p-6">
+            <h4 class="text-lg font-bold mb-4 flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></span>
+              Risky Files Detected
+            </h4>
+            <ul id="risky-files-list" class="space-y-4">
+              <!-- Javascript will inject list here -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECURITY REPORT PAGE -->
+      <div id="page-security-report" class="page-content animate-fade-in">
+        <h2 class="text-3xl font-extrabold text-white mb-2">Terminal Security Report</h2>
+        <p class="text-gray-400 mb-8">Detailed breakdown of the most recently analyzed vulnerabilities.</p>
+
+        <div id="security-empty-state" class="bg-cardDark p-10 rounded-2xl border border-gray-800 text-center">
+          <p class="text-gray-400 mb-6">No security report generated. Run an analysis from Code Review or GitHub
+            Analyzer first.</p>
+        </div>
+
+        <div id="security-results-view" class="hidden">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold">Detailed Issue Logs</h3>
+            <button
+              class="bg-gray-800 hover:bg-gray-700 text-xs px-4 py-2 rounded-lg text-white font-medium border border-gray-700">Export
+              PDF</button>
+          </div>
+
+          <!-- Section: Critical / High -->
+          <div class="space-y-6" id="security-issues-container">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+
+</html>
