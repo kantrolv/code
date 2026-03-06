@@ -1,128 +1,135 @@
-# 🤖 CodeRefine – AI Code Review & Optimization Engine
+# 🚀 CodeRefine AI – AI Code Review & Security Analyzer
 
-> Paste your code → get an instant AI-powered review, security audit, and optimized rewrite — powered by **Llama 3.3-70b** on **Groq**.
-
----
-
-## ✨ Features
-
-- 🔍 **Code Review** — Detects bugs, security holes, performance issues & best-practice violations
-- 🎯 **Severity Classification** — Critical / High / Medium / Low with live counters
-- 🔄 **Auto Rewrite** — Refactors & rewrites code following clean-code principles
-- 🎨 **Syntax Highlighting** — via Highlight.js (Python, JS, TS, Java, C++)
-- 📝 **Markdown Rendering** — AI responses rendered as rich Markdown via Marked.js
-- 📋 **One-click Copy** — Copy review text or rewritten code
-- 💡 **Demo Samples** — Built-in intentionally buggy samples for each language
+CodeRefine AI is a full-stack, AI-powered developer tool that performs automated code analysis, security scanning, and intelligent code rewriting. By leveraging large language models, this platform helps developers improve code quality, automatically review code, detect vulnerabilities, and instantly refactor complex syntax.
 
 ---
 
-## 🗂️ Project Structure
+## ✨ Key Features
 
-```
-coderefine-ai-code-review-full-repo/
+- **🔍 AI Code Review**: Analyze source code to detect bugs, security issues, and performance problems.
+- **🛠️ AI Code Rewrite**: Automatically refactor and optimize code using state-of-the-art AI.
+- **📁 GitHub Repository Analyzer**: Analyze entire GitHub repositories and detect risky files and vulnerabilities.
+- **🛡️ Security Analysis**: Identify insecure coding patterns, exposed credentials, and risky configurations.
+- **💡 Code Explanation**: Explain complex code logic using AI to help developers rapidly understand new codebases.
+
+---
+
+## 💻 Tech Stack
+
+### Frontend
+- **HTML5**
+- **Tailwind CSS**
+- **JavaScript (Vanilla)**
+
+### Backend
+- **Python**
+- **FastAPI**
+
+### AI Capabilities
+- **Groq API**
+- **Llama 3.3 70B Model**
+
+### Other Tools
+- **GitPython**
+- **Docker**
+- **Render** (Deployment)
+
+---
+
+## 🏗️ Architecture Overview
+
+The system follows a streamlined flow for rapid analysis:
+
+**User Input** ➔ **FastAPI Backend** ➔ **AI Model (Groq)** ➔ **Code Analysis** ➔ **Results Displayed in UI**
+
+---
+
+## 📂 Project Structure
+
+```text
+.
 ├── backend/
-│   ├── main.py           ← FastAPI app (endpoints + Groq AI + parser)
-│   ├── requirements.txt
-│   └── .env              ← GROQ_API_KEY goes here
+│   ├── main.py
+│   ├── ai_service.py
+│   ├── github_analyzer.py
+│   └── requirements.txt
 ├── frontend/
-│   ├── index.html        ← Full dark-theme UI
-│   ├── script.js         ← All frontend logic
-│   └── styles.css        ← Custom styles (glass cards, severity chips…)
-├── requirements.txt      ← Root-level deps (same as backend)
-└── .env.example
+│   ├── index.html
+│   ├── script.js
+│   └── styles.css
+├── Dockerfile
+└── render.yaml
 ```
 
 ---
 
-## 🚀 Quick Start
+## ⚙️ Installation
 
-### 1. Get a Groq API Key
+To run this project locally, follow these steps:
 
-Sign up at [console.groq.com](https://console.groq.com) — it's free.
-
-### 2. Configure the API key
-
+**1. Clone the repository**
 ```bash
-cp .env.example backend/.env
-# Edit backend/.env and paste your GROQ_API_KEY
+git clone https://github.com/kantrolv/code
 ```
 
-### 3. Install dependencies
-
+**2. Navigate into the project**
 ```bash
-pip install -r requirements.txt
+cd code
 ```
 
-### 4. Run the server
-
+**3. Install dependencies**
 ```bash
-cd backend
-uvicorn main:app --reload
+pip install -r backend/requirements.txt
 ```
 
-### 5. Open the browser
-
-```
-http://localhost:8000
-```
-
----
-
-## 🔌 API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET`  | `/` | Serves `frontend/index.html` |
-| `POST` | `/api/review` | AI code review with severity breakdown |
-| `POST` | `/api/rewrite` | AI code rewrite & optimization |
-| `GET`  | `/health` | Health check + config status |
-
-### POST `/api/review`
-
-```json
-{
-  "code": "string",
-  "language": "Python",
-  "focus_areas": ["Bugs", "Security", "Performance", "Best Practices"]
-}
+**4. Add environment variables**
+Create a `.env` file in the root or backend directory and add your Groq API key:
+```env
+GROQ_API_KEY=your_api_key
 ```
 
-### POST `/api/rewrite`
-
-```json
-{
-  "code": "string",
-  "language": "Python"
-}
+**5. Run the server**
+```bash
+uvicorn backend.main:app --reload
 ```
 
 ---
 
-## ⚙️ Model Configuration
+## 🚀 Deployment
 
-In `backend/main.py`:
+The application is fully containerized and automatically deployed using **Docker** and **Render**.
 
-```python
-MODEL       = "llama-3.3-70b-versatile"
-TEMPERATURE = 0.3
-MAX_TOKENS  = 2000
-TOP_P       = 0.9
-```
+**Deployment Steps:**
+1. Code is pushed to GitHub.
+2. Render reads the `render.yaml` configuration.
+3. Docker builds the application container based on the `Dockerfile`.
+4. The FastAPI server is automatically started and exposed securely.
 
 ---
 
-## 🛠️ Tech Stack
+## 🌐 Live Demo
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | FastAPI + Uvicorn |
-| AI Model | Llama 3.3-70b via Groq SDK |
-| Frontend | HTML5 + Tailwind CSS + Vanilla JS |
-| Code Highlighting | Highlight.js |
-| Markdown Rendering | Marked.js |
+Experience CodeRefine AI live:  
+👉 **[Live Demo: https://coderefine-ai.onrender.com](https://coderefine-ai.onrender.com)**
+
+---
+
+## 🔮 Future Improvements
+
+- [ ] **Automated PR Generation**: Generate automatic pull requests for fixing detected vulnerabilities.
+- [ ] **Advanced Security Scoring**: Provide standard security benchmarking and grading for scanned repositories.
+- [ ] **Dependency Scanning**: Identify and alert users on outdated or vulnerable repository dependencies.
+- [ ] **Real-Time Collaboration**: Real-time collaborative workspace for development teams.
+
+---
+
+## 🤝 Contributing
+
+Contributions are always welcome!  
+If you have suggestions or want to add features, feel free to **open an issue** or **submit a pull request**. 
 
 ---
 
 ## 📄 License
 
-MIT
+This project is licensed under the **MIT License**.
