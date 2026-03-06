@@ -54,7 +54,7 @@ def analyze_github_repo(repo_url: str) -> dict:
                     rel_path = os.path.relpath(file_path, temp_dir)
                     
                     try:
-                        with open(file_path, "r", encoding="utf-8") as f:
+                        with open(file_path, "r", encoding="utf-8", errors="replace") as f:
                             content = f.read()
                             # Basic limit per file to avoid huge files crashing the prompt
                             if len(content) > 100000:

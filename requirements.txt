@@ -5,3 +5,6 @@ groq
 httpx
 python-multipart
 pydantic
+GitPython
+requests
+reportlab

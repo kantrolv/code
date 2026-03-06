@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: coderefine-ai
+    env: docker
+    plan: free
+    branch: main
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false

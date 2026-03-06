@@ -37,9 +37,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ── Static files ─────────────────────────────────────────────────────────────
+# ── Frontend Directory ─────────────────────────────────────────────────────────
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
-app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR)), name="static")
 
 # ── Pydantic models ──────────────────────────────────────────────────────────
 class ReviewRequest(BaseModel):
@@ -84,14 +83,7 @@ class GithubAnalyzeRequest(BaseModel):
 class ReportRequest(BaseModel):
     markdown: str
 
-# ── Routes ───────────────────────────────────────────────────────────────────
-@app.get("/", response_class=HTMLResponse, tags=["Frontend"])
-async def serve_frontend():
-    """Serve the main index.html frontend."""
-    html_path = FRONTEND_DIR / "index.html"
-    if not html_path.exists():
-        raise HTTPException(status_code=404, detail="Frontend not found")
-    return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
+# ── API Routes ───────────────────────────────────────────────────────────────────
 
 
 @app.post("/api/review", tags=["AI"])
@@ -329,3 +321,7 @@ async def download_report(req: ReportRequest):
 @app.get("/health", tags=["Utility"])
 async def health():
     return {"status": "ok", "model": MODEL, "groq_configured": bool(GROQ_API_KEY)}
+
+# ── Serve Frontend ──────────────────────────────────────────────────────────────────
+# Mount at the root, MUST be defined after API routes to avoid shadowing
+app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
