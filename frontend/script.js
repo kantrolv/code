@@ -23,12 +23,12 @@ navLinks.forEach(link => {
     link.addEventListener('click', () => {
         // Change link styles
         navLinks.forEach(l => {
-            l.classList.remove('bg-accent/10', 'text-accent');
+            l.classList.remove('bg-blue-50', 'text-blue-600');
             l.querySelector('.sidebar-text')?.classList.remove('font-bold');
-            if (l !== link) l.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
+            if (l !== link) l.classList.add('text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-50');
         });
-        link.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
-        link.classList.add('bg-accent/10', 'text-accent');
+        link.classList.remove('text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-50');
+        link.classList.add('bg-blue-50', 'text-blue-600');
         link.querySelector('.sidebar-text')?.classList.add('font-bold');
 
         // Toggle page content
@@ -59,11 +59,11 @@ const metricsChart = new Chart(ctx, {
             label: 'System Score',
             data: [85, 78, 92, 80, 75],
             backgroundColor: gradient,
-            borderColor: '#7c3aed',
+            borderColor: '#2563eb',
             pointBackgroundColor: '#fff',
-            pointBorderColor: '#7c3aed',
+            pointBorderColor: '#2563eb',
             pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: '#7c3aed',
+            pointHoverBorderColor: '#2563eb',
             borderWidth: 2,
         }]
     },
@@ -72,10 +72,10 @@ const metricsChart = new Chart(ctx, {
         maintainAspectRatio: false,
         scales: {
             r: {
-                angleLines: { color: 'rgba(255, 255, 255, 0.05)' },
-                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                angleLines: { color: 'rgba(0, 0, 0, 0.05)' },
+                grid: { color: 'rgba(0, 0, 0, 0.1)' },
                 pointLabels: {
-                    color: '#94a3b8',
+                    color: '#64748b',
                     font: { size: 12, family: 'Inter', weight: '600' }
                 },
                 ticks: { display: false, min: 0, max: 100 }
@@ -318,24 +318,24 @@ if (btnAnalyzeRepo) {
 
             // Adjust risk colors
             if (riskLvl === 'High') {
-                riskEl.className = "text-3xl font-black text-red-500 uppercase mt-1";
-                riskEl.parentElement.className = "bg-cardDark p-6 rounded-2xl border border-red-500/30 text-center bg-red-900/10";
+                riskEl.className = "text-3xl font-black text-red-600 uppercase mt-1";
+                riskEl.parentElement.className = "bg-red-50 p-6 rounded-xl border border-red-200 text-center shadow-sm";
             } else if (riskLvl === 'Medium') {
-                riskEl.className = "text-3xl font-black text-orange-400 uppercase mt-1";
-                riskEl.parentElement.className = "bg-cardDark p-6 rounded-2xl border border-orange-500/30 text-center bg-orange-900/10";
+                riskEl.className = "text-3xl font-black text-orange-600 uppercase mt-1";
+                riskEl.parentElement.className = "bg-orange-50 p-6 rounded-xl border border-orange-200 text-center shadow-sm";
             } else {
-                riskEl.className = "text-3xl font-black text-emerald-400 uppercase mt-1";
-                riskEl.parentElement.className = "bg-cardDark p-6 rounded-2xl border border-emerald-500/30 text-center bg-emerald-900/10";
+                riskEl.className = "text-3xl font-black text-emerald-600 uppercase mt-1";
+                riskEl.parentElement.className = "bg-emerald-50 p-6 rounded-xl border border-emerald-200 text-center shadow-sm";
             }
 
             // Fake extraction of risky files for display in the cards (In realities, we'd parse data.raw_response)
             const listObj = $('risky-files-list');
             listObj.innerHTML = `
-               <li class="p-4 bg-bgDark border border-gray-800 rounded-lg">
+               <li class="p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-sm">
                    <div class="flex items-center gap-2 mb-1">
-                     <span class="text-orange-400 font-bold whitespace-break-spaces break-all">⚠ Repository wide findings</span>
+                     <span class="text-orange-600 font-bold whitespace-break-spaces break-all">⚠ Repository wide findings</span>
                    </div>
-                   <p class="text-sm text-gray-400">See full Security Report for details.</p>
+                   <p class="text-sm text-slate-500">See full Security Report for details.</p>
                </li>`;
 
             // Auto-populate the security report page
@@ -370,7 +370,7 @@ function fillSecurityReport(markdownData, titleString = "Detailed Security Break
 
     // Inject the raw marked HTML
     $('security-issues-container').innerHTML = `
-       <div class="bg-cardDark p-6 rounded-2xl border border-gray-800 shadow-lg prose-dark prose prose-invert w-full max-w-none">
+       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm prose-slate prose w-full max-w-none">
            ${marked.parse(decorateMarkdown(mdWrapped))}
        </div>
     `;
