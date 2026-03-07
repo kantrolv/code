@@ -13,7 +13,8 @@ from pydantic import BaseModel, validator
 from dotenv import load_dotenv
 
 # Ensure dotenv is loaded before ai_service is imported
-load_dotenv()
+env_path = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 from ai_service import call_groq, MODEL, GROQ_API_KEY
 from parser import parse_review_response
@@ -82,6 +83,10 @@ class GithubAnalyzeRequest(BaseModel):
 
 class ReportRequest(BaseModel):
     markdown: str
+
+class CheckSyntaxRequest(BaseModel):
+    code: str
+    language: str
 
 # ── API Routes ───────────────────────────────────────────────────────────────────
 
@@ -259,7 +264,66 @@ REPOSITORY CODE:
     })
 
 import io
+import ast
 from fastapi.responses import Response
+
+SYNTAX_HINTS = {
+    "unterminated string literal": {
+        "what": "A string literal (text enclosed in quotes) is missing its closing quote.",
+        "improve": "Always ensure every opening quote has a matching closing quote of the same type.",
+        "correct": "Add the missing quote (e.g. \") at the end of the text.",
+    },
+    "unexpected eof while parsing": {
+        "what": "The code ended unexpectedly. You likely have unclosed parentheses, brackets, or blocks.",
+        "improve": "Use an editor with bracket matching to ensure all blocks are closed.",
+        "correct": "Check for missing closing parentheses ')', brackets ']', or braces '}'.",
+    },
+    "invalid syntax": {
+        "what": "The code violates Python's grammar rules.",
+        "improve": "Review the exact character or statement at the error line.",
+        "correct": "Ensure you aren't missing colons ':', commas ',', or using reserved keywords incorrectly.",
+    },
+    "expected an indented block": {
+        "what": "Python expected indented code after a statement ending with a colon (like if, for, def).",
+        "improve": "Be consistent with indentation (use 4 spaces).",
+        "correct": "Add proper indentation to the line following the colon.",
+    },
+    "unmatched": {
+        "what": "There's a closing parenthesis, bracket, or brace without a corresponding opening one.",
+        "improve": "Visually trace your braces to ensure they come in pairs.",
+        "correct": "Add the missing opening bracket or remove the extra closing bracket."
+    }
+}
+
+def enhance_syntax_error(msg: str):
+    msg_lower = msg.lower()
+    for key, hints in SYNTAX_HINTS.items():
+        if key in msg_lower:
+            return hints
+    return {
+        "what": "The code contains a syntax formulation error that prevents it from running.",
+        "improve": "Review the syntax rules for this specific programming language construct.",
+        "correct": "Check for typos, missing punctuation, unclosed quotes/brackets, or misspellings."
+    }
+
+@app.post("/api/check_syntax", tags=["Utility"])
+async def check_syntax_api(req: CheckSyntaxRequest):
+    errors = []
+    if req.language.lower() == "python":
+        try:
+            ast.parse(req.code)
+        except SyntaxError as e:
+            msg = e.msg or "Syntax Error"
+            hints = enhance_syntax_error(msg)
+            errors.append({
+                "line": e.lineno,
+                "column": e.offset or 0,
+                "message": msg,
+                "what": hints["what"],
+                "improve": hints["improve"],
+                "correct": hints["correct"]
+            })
+    return JSONResponse(content={"errors": errors})
 
 @app.post("/api/download-report", tags=["Utility"])
 async def download_report(req: ReportRequest):

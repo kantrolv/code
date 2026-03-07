@@ -105,6 +105,127 @@ const btnReview = $('btn-review');
 const btnExplain = $('btn-explain');
 const btnRewrite = $('btn-rewrite');
 
+// Ace Editor Setup
+let editor = null;
+if ($('code-input')) {
+    editor = ace.edit("code-input");
+    editor.setTheme("ace/theme/chrome");
+    editor.session.setMode("ace/mode/python");
+    editor.setOptions({
+        fontSize: "14px",
+        showPrintMargin: false,
+        wrap: true,
+        useWorker: true // Enables built-in linters for JS/CSS/etc.
+    });
+
+    // Auto-check syntax on change for Python
+    let syntaxCheckTimeout;
+    editor.session.on('change', () => {
+        clearTimeout(syntaxCheckTimeout);
+        syntaxCheckTimeout = setTimeout(checkSyntax, 1000);
+    });
+}
+
+const getLanguageMode = (lang) => {
+    lang = lang.toLowerCase();
+    if (lang === 'c++') return 'c_cpp';
+    if (lang === 'typescript') return 'typescript';
+    if (lang === 'javascript') return 'javascript';
+    if (lang === 'java') return 'java';
+    return 'python';
+};
+
+if ($('language-select')) {
+    $('language-select').addEventListener('change', (e) => {
+        if (editor) {
+            editor.session.setMode("ace/mode/" + getLanguageMode(e.target.value));
+            checkSyntax();
+        }
+    });
+}
+
+function getCodeValue() {
+    return editor ? editor.getValue() : '';
+}
+
+let errorMarkers = [];
+
+async function checkSyntax() {
+    if (!editor) return;
+    const code = editor.getValue();
+    const language = $('language-select').value;
+
+    // Clear previous UI errors and markers
+    const errorDisplay = $('syntax-error-display');
+    const errorText = $('syntax-error-text');
+    if (errorDisplay) errorDisplay.classList.add('hidden');
+
+    if (editor.session) {
+        errorMarkers.forEach(m => editor.session.removeMarker(m));
+        errorMarkers = [];
+        editor.session.setAnnotations([]);
+    }
+
+    // Ace has built-in workers for Javascript/TypeScript, so we only need backend for Python
+    if (language !== 'Python') return;
+
+    if (!code.trim()) return;
+
+    try {
+        const res = await fetch('/api/check_syntax', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, language })
+        });
+        const data = await res.json();
+        if (data.errors && data.errors.length > 0) {
+            const Range = ace.require('ace/range').Range;
+            const annotations = [];
+
+            data.errors.forEach(err => {
+                const row = err.line - 1;
+                const col = err.column;
+
+                annotations.push({
+                    row: row,
+                    column: col,
+                    text: err.message,
+                    type: "error"
+                });
+
+                // Add marker to highlight the issue line
+                const range = new Range(row, 0, row, 100);
+                const markerId = editor.session.addMarker(range, "ace_error-marker", "fullLine", false);
+                errorMarkers.push(markerId);
+            });
+
+            editor.session.setAnnotations(annotations);
+
+            // Show UI Banner
+            if (errorDisplay && errorText) {
+                const errInfo = data.errors[0];
+                let infoHtml = '';
+                if (errInfo.what && errInfo.improve && errInfo.correct) {
+                    infoHtml = `
+                    <div class="mt-2 ml-1 text-xs text-red-700 bg-red-100 p-3 rounded-lg flex flex-col gap-2">
+                        <p><strong>🤔 What is the error?</strong><br/>${errInfo.what}</p>
+                        <p><strong>💡 How to improve it:</strong><br/>${errInfo.improve}</p>
+                        <p><strong>✅ How to correct it:</strong><br/>${errInfo.correct}</p>
+                    </div>`;
+                } else {
+                    infoHtml = `<p class="mt-1">${errInfo.message}</p>`;
+                }
+
+                errorText.innerHTML = `<span class="font-bold text-red-800 text-base">🚨 Syntax Error at line ${errInfo.line}</span>${infoHtml}`;
+                errorDisplay.classList.remove('hidden');
+            }
+        }
+    } catch (err) {
+        console.error("Syntax check error", err);
+    }
+}
+
+
 // Sample Code loader
 const DEMO_CODE = `function processPayment(userId, amt, callback) {
   var sql = "UPDATE users SET balance = balance - " + amt + " WHERE id = '" + userId + "'";
@@ -115,8 +236,11 @@ const DEMO_CODE = `function processPayment(userId, amt, callback) {
 }`;
 if (loadDemoBtn) {
     loadDemoBtn.addEventListener('click', () => {
-        $('code-input').value = DEMO_CODE;
+        if (editor) {
+            editor.setValue(DEMO_CODE, -1);
+        }
         $('language-select').value = "JavaScript";
+        if (editor) editor.session.setMode("ace/mode/javascript");
     });
 }
 
@@ -132,7 +256,7 @@ function decorateMarkdown(md) {
 // 1. Review Code
 if (btnReview) {
     btnReview.addEventListener('click', async () => {
-        const code = $('code-input').value.trim();
+        const code = getCodeValue().trim();
         if (!code) return alert("Please paste code to review.");
 
         const language = $('language-select').value;
@@ -148,6 +272,12 @@ if (btnReview) {
                 body: JSON.stringify({ code, language, focus_areas })
             });
             const data = await res.json();
+
+            if (!res.ok || data.detail) {
+                const msg = data.detail || "Server error";
+                alert("Review Failed: " + msg);
+                return;
+            }
 
             // Populate Original Code side
             $('review-orig-code').textContent = code;
@@ -176,7 +306,7 @@ if (btnReview) {
 // 2. Explain Code
 if (btnExplain) {
     btnExplain.addEventListener('click', async () => {
-        const code = $('code-input').value.trim();
+        const code = getCodeValue().trim();
         if (!code) return alert("Please paste code to explain.");
 
         const language = $('language-select').value;
@@ -213,7 +343,7 @@ if (btnExplain) {
 // 3. Fix & Rewrite
 if (btnRewrite) {
     btnRewrite.addEventListener('click', async () => {
-        const code = $('code-input').value.trim();
+        const code = getCodeValue().trim();
         if (!code) return alert("Please paste code to rewrite.");
 
         const language = $('language-select').value;
