@@ -1,5 +1,5 @@
 /*
-  CodeRefine AI - Custom CSS
+  CodeRefine AI - Custom CSS (Pure Light Theme)
 */
 
 /* Base overrides */
@@ -9,6 +9,7 @@ body {
   padding: 0;
   height: 100%;
   width: 100%;
+  background-color: #f8fafc;
 }
 
 * {
@@ -21,16 +22,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94a3b8;
 }
 
 /* Sidebar transitions */
@@ -84,9 +85,9 @@ body {
 }
 
 .spinner {
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-left-color: #7c3aed;
-  /* accent */
+  border: 4px solid #eff6ff;
+  border-left-color: #2563eb;
+  /* accent blue-600 */
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -100,44 +101,45 @@ body {
 }
 
 /* Prose for AI results */
-.prose-dark {
-  color: #cbd5e1;
+.prose-slate {
+  color: #334155;
+  /* text-slate-700 */
 }
 
-.prose-dark h1,
-.prose-dark h2,
-.prose-dark h3,
-.prose-dark h4 {
-  color: #f8fafc;
+.prose-slate h1,
+.prose-slate h2,
+.prose-slate h3,
+.prose-slate h4 {
+  color: #0f172a;
   margin-top: 1.5em;
   margin-bottom: 0.5em;
   font-weight: 600;
 }
 
-.prose-dark h2 {
+.prose-slate h2 {
   font-size: 1.25rem;
-  border-bottom: 1px solid #334155;
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 0.3em;
 }
 
-.prose-dark h3 {
+.prose-slate h3 {
   font-size: 1.1rem;
 }
 
-.prose-dark p {
+.prose-slate p {
   margin-bottom: 1em;
   line-height: 1.6;
 }
 
-.prose-dark ul {
+.prose-slate ul {
   list-style-type: disc;
   padding-left: 1.5em;
   margin-bottom: 1em;
 }
 
-.prose-dark pre {
-  background-color: #0f172a;
-  border: 1px solid #334155;
+.prose-slate pre {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
   padding: 1rem;
   overflow-x: auto;
@@ -145,16 +147,17 @@ body {
   margin-bottom: 1em;
 }
 
-.prose-dark code {
+.prose-slate code {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.875rem;
 }
 
-.prose-dark p code {
-  background-color: rgba(124, 58, 237, 0.15);
+.prose-slate p code {
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
   padding: 0.1rem 0.3rem;
   border-radius: 0.25rem;
-  color: #a78bfa;
+  color: #0f172a;
 }
 
 /* Issue Badges */
@@ -170,27 +173,27 @@ body {
 }
 
 .badge-critical {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border: 1px solid #ef4444;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 .badge-high {
-  background: rgba(249, 115, 22, 0.2);
-  color: #f97316;
-  border: 1px solid #f97316;
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
 }
 
 .badge-medium {
-  background: rgba(234, 179, 8, 0.2);
-  color: #eab308;
-  border: 1px solid #eab308;
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1px solid #fef08a;
 }
 
 .badge-low {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  border: 1px solid #3b82f6;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
 }
 
 /* Setup Banner */
