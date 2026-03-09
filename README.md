@@ -4,7 +4,7 @@ CodeRefine AI is a full-stack, AI-powered developer tool that performs automated
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features 
 
 - **🔍 AI Code Review**: Analyze source code to detect bugs, security issues, and performance problems.
 - **🛠️ AI Code Rewrite**: Automatically refactor and optimize code using state-of-the-art AI.
